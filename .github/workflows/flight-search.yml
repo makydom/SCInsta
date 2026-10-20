@@ -1,0 +1,30 @@
+name: Flight search
+
+on:
+    push:
+        branches:
+            - 'claude/skyscanner-bangkok-chiang-mai-n89m6d'
+        paths:
+            - '.github/flight-search/**'
+            - '.github/workflows/flight-search.yml'
+
+jobs:
+    search:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-python@v5
+              with:
+                python-version: '3.12'
+            - name: Install
+              run: |
+                pip install fast-flights==3.1.0 playwright
+                python -m playwright install --with-deps chromium
+            - name: Search
+              run: python .github/flight-search/search.py
+            - uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                name: skyscanner-screenshot
+                path: skyscanner.png
+                if-no-files-found: ignore
